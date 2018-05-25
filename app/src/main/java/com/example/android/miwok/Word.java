@@ -17,10 +17,11 @@ public class Word {
      */
     private String mMiwokTranslation;
 
+    private static final int NO_IMAGE_PROVIDED = -1;
     /**
      * Image resource ID for the word
      */
-    private int mImageResourceId;
+    private int mImageResourceId = NO_IMAGE_PROVIDED;
 
     /**
      * @param defaultTranslation - a word with user is familiar with
@@ -53,6 +54,13 @@ public class Word {
 
     public int getImageResourceId() {
         return mImageResourceId;
+    }
+
+    /**
+     * @return do we have an image for the word
+     */
+    public boolean hasImage() {
+        return mImageResourceId != NO_IMAGE_PROVIDED;
     }
 
 }
