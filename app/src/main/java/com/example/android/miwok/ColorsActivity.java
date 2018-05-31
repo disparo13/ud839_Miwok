@@ -27,7 +27,15 @@ import java.util.ArrayList;
 
 public class ColorsActivity extends AppCompatActivity {
 
-    MediaPlayer colorsPlayer;
+    private MediaPlayer mMediaPlayer;
+
+    // Setting the global onCompletionListener
+    private MediaPlayer.OnCompletionListener mOnCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            releaseMediaPlayer();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +44,22 @@ public class ColorsActivity extends AppCompatActivity {
 
         final ArrayList<Word> words = new ArrayList<Word>();
 
-        words.add(new Word("red", "weṭeṭṭi", R.raw.color_red, R.drawable.color_red));
-        words.add(new Word("green", "chokokki", R.raw.color_green, R.drawable.color_green));
-        words.add(new Word("brown", "ṭakaakki", R.raw.color_brown, R.drawable.color_brown));
-        words.add(new Word("gray", "ṭopoppi", R.raw.color_gray, R.drawable.color_gray));
-        words.add(new Word("black", "kululli", R.raw.color_black, R.drawable.color_black));
-        words.add(new Word("white", "kelelli", R.raw.color_white, R.drawable.color_white));
-        words.add(new Word("dusty yellow", "ṭopiisә", R.raw.color_dusty_yellow, R.drawable.color_dusty_yellow));
-        words.add(new Word("mustard yellow", "chiwiiṭә", R.raw.color_mustard_yellow, R.drawable.color_mustard_yellow));
+        words.add(new Word("red", "weṭeṭṭi", R.raw.color_red,
+                R.drawable.color_red));
+        words.add(new Word("green", "chokokki",
+                R.raw.color_green, R.drawable.color_green));
+        words.add(new Word("brown", "ṭakaakki",
+                R.raw.color_brown, R.drawable.color_brown));
+        words.add(new Word("gray", "ṭopoppi", R.raw.color_gray,
+                R.drawable.color_gray));
+        words.add(new Word("black", "kululli", R.raw.color_black,
+                R.drawable.color_black));
+        words.add(new Word("white", "kelelli", R.raw.color_white,
+                R.drawable.color_white));
+        words.add(new Word("dusty yellow", "ṭopiisә", R.raw.color_dusty_yellow,
+                R.drawable.color_dusty_yellow));
+        words.add(new Word("mustard yellow", "chiwiiṭә", R.raw.color_mustard_yellow,
+                R.drawable.color_mustard_yellow));
 
         // Create an {@link WordAdapter}, whose data source is a list of Strings. The
         // adapter knows how to create layouts for each item in the list, using the
@@ -64,11 +80,18 @@ public class ColorsActivity extends AppCompatActivity {
         // 1 argument, which is the {@link ArrayAdapter} with the variable name itemsAdapter.
         listView.setAdapter(adapter);
 
+        // Get sound resource of current word and play it
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                colorsPlayer = MediaPlayer.create(ColorsActivity.this, words.get(position).getSoundResourceId());
-                colorsPlayer.start();
+                // Release media player before playing file
+                releaseMediaPlayer();
+
+                mMediaPlayer = MediaPlayer.create(ColorsActivity.this, words.get(position).getSoundResourceId());
+                mMediaPlayer.start();
+
+                // Call global on completion listener
+                mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
             }
         });
 
@@ -84,4 +107,21 @@ public class ColorsActivity extends AppCompatActivity {
 
 
     }
+
+    /**
+     * Clean up the media player by releasing its resources.
+     */
+    private void releaseMediaPlayer() {
+        // If the media player is not null, then it may be currently playing a sound.
+        if (mMediaPlayer != null) {
+            // Regardless of the current state of the media player, release its resources
+            // because we no longer need it.
+            mMediaPlayer.release();
+            // Set the media player back to null. For our code, we've decided that
+            // setting the media player to null is an easy way to tell that the media player
+            // is not configured to play an audio file at the moment.
+            mMediaPlayer = null;
+        }
+    }
+
 }
